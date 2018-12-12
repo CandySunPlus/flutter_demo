@@ -26,7 +26,7 @@ class BarPage extends StatelessWidget {
 
 class HomePageTopBar extends StatefulWidget implements PreferredSizeWidget {
   HomePageTopBar({Key key, this.tabbar})
-      : preferredSize = Size.fromWidth(kToolbarHeight),
+      : preferredSize = Size.fromHeight(kToolbarHeight),
         super(key: key);
 
   final Widget tabbar;
