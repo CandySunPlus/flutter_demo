@@ -1,133 +1,75 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
+class FooPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return CupertinoApp(
-      title: 'Welcome to Flutter',
-      home: RandomWords(),
-    );
-  }
+  _FooState createState() => new _FooState();
 }
 
-class RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final Set<WordPair> _saved = new Set<WordPair>();
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-
-  Widget _buildSuggestions() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-      itemBuilder: (context, i) {
-        if (i >= _suggestions.length) {
-          _suggestions.addAll(generateWordPairs().take(10));
-        }
-        return _buildRow(_suggestions[i]);
-      },
-    );
-  }
-
-  Widget _buildRow(WordPair pair) {
-    final bool alreadySaved = _saved.contains(pair);
-    return GestureDetector(
-      child: Container(
-        padding: const EdgeInsets.all(20.0),
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(width: 0.5, color: Color(0xFFFFDFDFDF)),
-          ),
-        ),
-        child: Row(children: <Widget>[
-          Expanded(
-            child: Text(
-              pair.asPascalCase,
-              style: _biggerFont,
-            ),
-          ),
-          Icon(
-            alreadySaved ? Icons.favorite : Icons.favorite_border,
-            color: alreadySaved ? Colors.red : null,
-          ),
-        ]),
-      ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(pair);
-          } else {
-            _saved.add(pair);
-          }
-        });
-      },
-    );
-  }
-
-  void _pushSaved() {
-    Navigator.of(context).push(
-      CupertinoPageRoute<void>(
-        title: 'Liked',
-        builder: (BuildContext context) {
-          final List<Widget> items =
-              _saved.map((WordPair pair) => _buildRow(pair)).toList();
-          return CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(middle: Text('Liked List')),
-            child: SafeArea(
-              top: true,
-              bottom: false,
-              child: ListView(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                children: items,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+class _FooState extends State<FooPage>
+    with AutomaticKeepAliveClientMixin<FooPage> {
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text('Startup Name Generator'),
-        trailing: TextButton(label: 'Liked', onPressed: _pushSaved),
-      ),
-      child: SafeArea(
-        top: true,
-        bottom: false,
-        child: _buildSuggestions(),
-      ),
-    );
+    super.build(context);
+    return Center(child: Text('foo'));
   }
 }
 
-class TextButton extends StatelessWidget {
-  const TextButton({
-    Key key,
-    this.label = 'Button',
-    @required this.onPressed,
-  })  : assert(label != null),
+class BarPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('bar'));
+  }
+}
+
+class HomePageTopBar extends StatefulWidget implements PreferredSizeWidget {
+  HomePageTopBar({Key key, this.tabbar})
+      : preferredSize = Size.fromWidth(kToolbarHeight),
         super(key: key);
 
-  final String label;
-
-  final VoidCallback onPressed;
+  final Widget tabbar;
 
   @override
+  final Size preferredSize;
+
+  @override
+  _HomePageTopBarState createState() => _HomePageTopBarState();
+}
+
+class _HomePageTopBarState extends State<HomePageTopBar> {
+  @override
   Widget build(BuildContext context) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      child: Text(this.label),
-      onPressed: this.onPressed,
-    );
+    final Widget toolbar = NavigationToolbar(leading: widget.tabbar);
+    return toolbar;
   }
 }
 
-class RandomWords extends StatefulWidget {
-  @override
-  RandomWordsState createState() => new RandomWordsState();
+void main() {
+  runApp(
+    MaterialApp(
+      home: DefaultTabController(
+        length: 3,
+        child: SafeArea(
+          top: true,
+          bottom: false,
+          child: Scaffold(
+            appBar: HomePageTopBar(
+              tabbar: TabBar(
+                labelColor: Colors.white,
+                indicator: BoxDecoration(),
+                unselectedLabelColor: Colors.black,
+                labelStyle: TextStyle(fontSize: 20.0),
+                tabs: [Text('foo'), Text('bar')],
+              ),
+            ),
+            body: TabBarView(
+              children: <Widget>[FooPage(), BarPage()],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
