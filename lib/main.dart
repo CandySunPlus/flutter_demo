@@ -10,10 +10,24 @@ class _FooState extends State<FooPage>
   @override
   bool get wantKeepAlive => true;
 
+  Widget _buildList() {
+    return ListView.builder(
+      itemCount: 40,
+      itemBuilder: (context, i) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 40.0, horizontal: 25.0),
+          margin: EdgeInsets.only(bottom: 10.0),
+          color: Colors.white,
+          child: Text("Number $i"),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Center(child: Text('foo'));
+    return _buildList();
   }
 }
 
@@ -25,11 +39,9 @@ class BarPage extends StatelessWidget {
 }
 
 class HomePageTopBar extends StatefulWidget implements PreferredSizeWidget {
-  HomePageTopBar({Key key, this.tabbar})
+  HomePageTopBar({Key key})
       : preferredSize = Size.fromHeight(kToolbarHeight),
         super(key: key);
-
-  final Widget tabbar;
 
   @override
   final Size preferredSize;
@@ -39,10 +51,84 @@ class HomePageTopBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _HomePageTopBarState extends State<HomePageTopBar> {
+  Widget _buildUserInfo() {
+    Widget userInfo = Row(
+      children: <Widget>[
+        Flexible(
+          flex: 0,
+          child: Text(
+            '未登录',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14.0,
+            ),
+          ),
+        ),
+        Flexible(
+          flex: 0,
+          child: CircleAvatar(
+            radius: 24.0,
+            backgroundImage: AssetImage('assets/default_avatar.png'),
+            backgroundColor: Colors.white,
+          ),
+        ),
+      ],
+    );
+    return userInfo;
+  }
+
+  Widget _buildTabbar() {
+    Widget tabbar = TabBar(
+      isScrollable: false,
+      labelPadding: EdgeInsets.zero,
+      labelColor: Colors.black,
+      indicator: BoxDecoration(),
+      indicatorWeight: 0,
+      unselectedLabelColor: const Color(0xFFC7C7C7),
+      labelStyle: TextStyle(
+        fontSize: 24.0,
+        fontWeight: FontWeight.bold,
+      ),
+      tabs: [
+        Text('种草'),
+        Text('关注'),
+      ],
+    );
+    tabbar = Container(
+      constraints: BoxConstraints(maxWidth: 136.0),
+      child: tabbar,
+    );
+    return tabbar;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Widget toolbar = NavigationToolbar(leading: widget.tabbar);
-    return toolbar;
+    Widget homePageTopBar = Row(
+      children: <Widget>[
+        Flexible(
+          flex: 0,
+          child: _buildTabbar(),
+        ),
+        Spacer(),
+        Flexible(
+          flex: 0,
+          child: _buildUserInfo(),
+        ),
+      ],
+    );
+
+    homePageTopBar = Container(
+      padding: EdgeInsets.symmetric(horizontal: 21.0),
+      constraints: BoxConstraints(maxHeight: 88.0),
+      child: homePageTopBar,
+    );
+
+    homePageTopBar = SafeArea(
+      top: true,
+      child: homePageTopBar,
+    );
+
+    return homePageTopBar;
   }
 }
 
@@ -51,20 +137,12 @@ void main() {
     MaterialApp(
       home: DefaultTabController(
         length: 3,
-        child: SafeArea(
-          top: true,
-          bottom: false,
-          child: Scaffold(
-            appBar: HomePageTopBar(
-              tabbar: TabBar(
-                labelColor: Colors.white,
-                indicator: BoxDecoration(),
-                unselectedLabelColor: Colors.black,
-                labelStyle: TextStyle(fontSize: 20.0),
-                tabs: [Text('foo'), Text('bar')],
-              ),
-            ),
-            body: TabBarView(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: HomePageTopBar(),
+          body: Container(
+            color: Color(0xFFF7F7F7),
+            child: TabBarView(
               children: <Widget>[FooPage(), BarPage()],
             ),
           ),
